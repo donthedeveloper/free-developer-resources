@@ -1,5 +1,8 @@
 import app from 'firebase/app';
 import 'firebase/auth';
+import 'firebase/firestore';
+
+// todo: just create fbConfig? #15
 
 const config = {
   apiKey: process.env.REACT_APP_API_KEY,
@@ -13,8 +16,10 @@ const config = {
 class Firebase {
   constructor() {
     app.initializeApp(config);
+    app.firestore().settings({ timestampsInSnapshots: true });
 
     this.auth = app.auth();
+    this.db = app.firestore();
   }
 
   // *** Auth API ***
@@ -31,6 +36,10 @@ class Firebase {
 
   doPasswordUpdate = password =>
     this.auth.currentUser.updatePassword(password);
+
+  // *** Firestore API ***
+
+  
 }
 
 export default Firebase;
