@@ -2,8 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { getFirebase, reactReduxFirebase } from 'react-redux-firebase';
-import { applyMiddleware, compose, createStore } from 'redux';
+import { applyMiddleware, createStore } from 'redux';
+import { composeWithDevTools } from 'redux-devtools-extension';
 import { getFirestore, reduxFirestore } from 'redux-firestore';
+import { createLogger } from 'redux-logger';
 import thunk from 'redux-thunk';
 import firebaseConfig from './config/firebaseConfig';
 import rootReducer from './rootReducer';
@@ -13,8 +15,9 @@ import App from './App/App.react';
 
 const store = createStore(
     rootReducer,
-    compose(
+    composeWithDevTools(
         applyMiddleware(
+            createLogger({ collapsed: true }),
             thunk.withExtraArgument({
                 getFirebase,
                 getFirestore

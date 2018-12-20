@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { Redirect } from 'react-router-dom';
 import { signIn } from '../Auth/Auth.actions';
 
 class SignIn extends Component {
@@ -21,6 +22,10 @@ class SignIn extends Component {
     };
 
     render() {
+        if (this.props.isLoggedIn) {
+            return <Redirect to='/' />
+        }
+
         return (
             <div>
                 <h1>Sign In</h1>
@@ -48,7 +53,8 @@ class SignIn extends Component {
 }
 
 const mapStateToProps = state => ({
-    error: state.auth.error
+    error: state.auth.error,
+    isLoggedIn: !!state.firebase.auth.uid
 });
 
 const mapDispatchToProps = dispatch => ({

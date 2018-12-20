@@ -26,6 +26,9 @@ class Navbar extends Component {
                         <li><NavLink className='navbar__link' to='/signin'>Login</NavLink></li>
                     }
                     {userIsLoggedIn &&
+                        <li><NavLink className='navbar__link' to='/profile'>Profile</NavLink></li>
+                    }
+                    {userIsLoggedIn &&
                         <li>
                             <a
                                 className='navbar__link'
@@ -37,7 +40,6 @@ class Navbar extends Component {
                         </li>
                     }
                     {/* <li><NavLink className='navbar__link' to='/admin'>Admin</NavLink></li> */}
-                    {/* <li><NavLink className='navbar__link' to='/profile'>Profile</NavLink></li> */}
                 </ul>
             </nav>
         );

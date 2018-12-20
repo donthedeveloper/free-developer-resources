@@ -1,4 +1,7 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { Redirect } from 'react-router-dom';
+import { signUp } from '../Auth/Auth.actions';
 
 class Signup extends Component {
 
@@ -15,15 +18,22 @@ class Signup extends Component {
         });
     };
 
-    handleSubmit(e) {
+    handleSubmit = (e) => {
         e.preventDefault();
-        // todo: hook up api call
-    }
+        this.props.signUp(this.state);
+    };
 
     render() {
+        const { error, isLoggedIn } = this.props;
+
+        if (isLoggedIn) {
+            return <Redirect to='/' />
+        }
+
         return (
             <div>
                 <h1>Signup</h1>
+                <p>{error}</p>
                 <form onSubmit={this.handleSubmit}>
                     <label htmlFor='firstName'>First Name</label>
                     <input
@@ -53,11 +63,20 @@ class Signup extends Component {
                         onChange={this.handleInputChange}
                         type='password'
                     />
-                    <button type='submit'>Log In</button>
+                    <button type='submit'>Sign Up</button>
                 </form>
             </div>
         )
     }
 }
 
-export default Signup;
+const mapStateToProps = state => ({
+    error: state.auth.error,
+    isLoggedIn: !!state.firebase.auth.uid
+});
+
+const mapDispatchToProps = dispatch => ({
+    signUp: newUser => dispatch(signUp(newUser))
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Signup);
