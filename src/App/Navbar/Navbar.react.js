@@ -40,15 +40,22 @@ class Navbar extends Component {
                         </li>
                     }
                     {/* <li><NavLink className='navbar__link' to='/admin'>Admin</NavLink></li> */}
+                    <li>{this.props.userInitials}</li>
                 </ul>
             </nav>
         );
     }
 };
 
-const mapStateToProps = state => ({
-    auth: state.firebase.auth
-})
+const mapStateToProps = state => {
+    const { firstName, lastName } = state.firebase.profile;
+    const firstInitial = firstName ? firstName[0].toUpperCase() : '';
+    const lastInitial = lastName ? lastName[0].toUpperCase() : '';
+    return {
+        auth: state.firebase.auth,
+        userInitials: firstInitial + lastInitial
+    }
+}
 
 const mapDispatchToProps = dispatch => ({
     signOut: () => dispatch(signOut())

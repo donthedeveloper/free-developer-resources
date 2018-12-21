@@ -24,7 +24,10 @@ const store = createStore(
             })
         ),
         reduxFirestore(firebaseConfig),
-        reactReduxFirebase(firebaseConfig)
+        reactReduxFirebase(firebaseConfig, {
+            useFirestoreForProfile: true,
+            userProfile: 'users'
+        })
     )
 );
 
