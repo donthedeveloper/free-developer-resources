@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import Admin from './Admin/Admin.react';
 import Navbar from './Navbar/Navbar.react';
 import Profile from './Profile/Profile.react';
@@ -13,11 +13,12 @@ const App = () => {
             <div>
                 <Navbar />
                 <Switch>
-                    <Route exact path='/' component={Resources} />
+                    <Route exact path='/resources' component={Resources} />
                     <Route path='/admin' component={Admin} />
                     <Route path='/profile' component={Profile} />
                     <Route path='/signin' component={SignIn} />
                     <Route path='/signup' component={Signup} />
+                    <Redirect to='/resources' />
                 </Switch>
             </div>
         </BrowserRouter>
