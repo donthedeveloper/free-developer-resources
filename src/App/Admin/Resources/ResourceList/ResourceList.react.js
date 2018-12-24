@@ -27,6 +27,9 @@ const mapStateToProps = (state) => ({
 export default compose(
     connect(mapStateToProps),
     firestoreConnect([
-        { collection: 'resources' }
+        {
+            collection: 'resources',
+            orderBy: ['createdAt', 'desc']
+        }
     ])
 )(ResourceList);
