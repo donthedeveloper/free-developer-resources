@@ -1,13 +1,16 @@
 .navbar {
+    background-color: #333;
     display: flex;
 
     &__link {
+        color: #fff;
         padding: 1rem;
+        text-decoration: none;
     }
 }
 
-.navbar-list {
-    display: flex;
-    list-style-type: none;
-    padding-left: 0;
-}
+// .navbar-list {
+//     display: flex;
+//     list-style-type: none;
+//     padding-left: 0;
+// }
