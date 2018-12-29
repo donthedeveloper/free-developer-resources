@@ -1,9 +1,9 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
 import { firestoreConnect } from 'react-redux-firebase';
 import { compose } from 'redux';
 import ResourceForm from './ResourceForm/ResourceForm.react';
-import { removeResource } from './Resources.actions';
+import { addResource, editResource, removeResource } from './Resources.actions';
 import './Resources.styles.scss';
 
 class Resources extends Component {
@@ -13,18 +13,32 @@ class Resources extends Component {
     };
 
     state = {
-        resourceIsBeingEdited: false
+        resourceBeingAdded: '',
+        resourceBeingEdited: ''
     };
 
-    saveResourceBeingEdited = () => {
-        
-        // todo: finished?
+    addResource = (resource) => {
+        this.props.addResource(resource);
+        // todo: this assumes it was successful without checking
         this.toggleEditResource();
     };
 
-    toggleEditResource() {
+    // saveResourceBeingEdited = () => {
+    editResource = (resource) => {
+        this.props.editResource(resource);
+        // todo: this assumes it was successful without checking
+        this.toggleEditResource();
+    };
+
+    toggleAddResource(resourceId = '') {
         this.setState({
-            resourceIsBeingEdited: !resourceIsBeingEdited
+            resourceBeingAdded: resourceId
+        });
+    }
+
+    toggleEditResource(resourceId = '') {
+        this.setState({
+            resourceBeingEdited: resourceId
         });
     }
 
@@ -44,19 +58,25 @@ class Resources extends Component {
                             <th>Admin</th>
                         </tr>
                         {this.props.resources && this.props.resources.map((resource) =>
-
-                            {this.state.resourceIsBeingEdited
-                                ? <ResourceForm resource={resource} onSubmit={this.saveResourceBeingEdited}
-                            }
-
-                            // <tr key={resource.id}>
-                            //     <td>{resource.name}</td>
-                            //     <td>{resource.description}</td>
-                            //     <td>
-                            //         <i className='far fa-edit' onClick={this.toggleEditResource}></i>
-                            //         <i className='far fa-trash-alt' onClick={() => this.props.removeResource(resource.id)}></i>
-                            //     </td>
-                            // </tr>
+                            <tr key={resource.id}>
+                                {
+                                    (this.state.resourceBeingEdited && resource.id === this.state.resourceBeingEdited)
+                                        ? (
+                                            <td colSpan='2'>
+                                                <ResourceForm resource={resource} onSubmit={this.editResource} />
+                                            </td>
+                                        ) : (
+                                            <Fragment>
+                                                <td>{resource.name}</td>
+                                                <td>{resource.description}</td>
+                                            </Fragment>
+                                        )
+                                }
+                                <td>
+                                    <i className='far fa-edit' onClick={this.toggleEditResource}></i>
+                                    <i className='far fa-trash-alt' onClick={() => this.props.removeResource(resource.id)}></i>
+                                </td>
+                            </tr>
                         )}
                     </tbody>
                 </table>
@@ -70,7 +90,9 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-    removeResource: (resourceId) => dispatch(removeResource(resourceId))
+    addResource: resource => dispatch(addResource(resource)),
+    removeResource: (resourceId) => dispatch(removeResource(resourceId)),
+    editResource: (resource) => dispatch(editResource(resource))
 });
 
 export default compose(
