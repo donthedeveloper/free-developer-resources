@@ -7,9 +7,11 @@ export const signIn = (credentials) =>
             .catch((error) => dispatch({ type: 'SIGNIN_ERROR', error}));
 
 export const signOut = () =>
-    (dispatch, getState, { getFirebase }) =>
-        getFirebase().auth().signOut()
+    (dispatch, getState, { getFirebase }) => {
+        console.log('sign out');
+        return getFirebase().auth().signOut()
             .then(() => dispatch({ type: 'SIGNOUT_SUCCESS' }));
+    }
 
 export const signUp = (newUser) =>
     (dispatch, getState, { getFirebase, getFirestore }) => {

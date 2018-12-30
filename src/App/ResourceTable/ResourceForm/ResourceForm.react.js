@@ -1,35 +1,31 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
-import { compose } from 'redux';
-import { createResource } from '../Resources.actions';
 
-class CreateResource extends Component {
+class ResourceForm extends Component {
 
-    state = {
-        name: '',
-        url: '',
-        description: ''
-    };
+    constructor(props) {
+        super(props);
+        const resource = props.resource;
+        this.state = {
+            description: resource ? resource.description : '',
+            name: resource ? resource.name : '',
+            url: resource ? resource.url : ''
+        }
+    }
 
-    handleInputChange = (event) => {
-        event.preventDefault();
+    handleInputChange = (e) => {
         this.setState({
-            [event.target.name]: event.target.value
+            [e.target.name]: e.target.value
         });
     };
 
-    handleFormSubmit = (e) => {
+    save = (e) => {
         e.preventDefault();
-        this.props.createResource(this.state)
-        // todo: this automatically assumes it was successful (bad)
-        // possibly lean on a success or failure modal sliding up and out, and then redirecting in componentDidUpdate
-        this.props.history.push('/admin/resources');
+        this.props.onSubmit(this.state);
     };
 
     render() {
         return (
-            <form onSubmit={this.handleFormSubmit}>
+            <form onSubmit={this.save}>
                 <label htmlFor='name'>Name</label>
                 <input
                     id='name'
@@ -54,17 +50,10 @@ class CreateResource extends Component {
                     type='text'
                     value={this.state.description}
                 />
-                <button type='submit'>Create</button>
+                <button type='submit'>Save</button>
             </form>
-        )
+        );
     }
 }
 
-const mapDispatchToProps = dispatch => ({
-    createResource: resource => dispatch(createResource(resource))
-})
-
-export default compose(
-    connect(null, mapDispatchToProps),
-    withRouter
-)(CreateResource);
+export default ResourceForm;
