@@ -17,7 +17,7 @@ class Navbar extends Component {
         return (
             <nav className='navbar'>
                 <Link className='navbar__link' to='/'>Free Developer Resources</Link>
-                {/* <ul className='navbar-list'>
+                <ul className='navbar-list'>
                     <li><NavLink className='navbar__link' to='/resources'>Resources</NavLink></li>
                     {!userIsLoggedIn &&
                         <li><NavLink className='navbar__link' to='/signup'>SignUp</NavLink></li>
@@ -30,18 +30,17 @@ class Navbar extends Component {
                     }
                     {userIsLoggedIn &&
                         <li>
-                            <a
+                            <button
                                 className='navbar__link'
-                                href='#'
                                 onClick={this.handleLogoutClick}
                             >
                                 Logout
-                            </a>
+                            </button>
                         </li>
                     }
                     <li><NavLink className='navbar__link' to='/admin'>Admin</NavLink></li>
                     <li>{this.props.userInitials}</li>
-                </ul> */}
+                </ul>
             </nav>
         );
     }
@@ -59,6 +58,6 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => ({
     signOut: () => dispatch(signOut())
-})
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(Navbar);

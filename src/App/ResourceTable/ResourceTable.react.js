@@ -2,62 +2,71 @@ import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
 import { firestoreConnect } from 'react-redux-firebase';
 import { compose } from 'redux';
+import { isAdmin } from '../Auth/Auth.utilities';
 import ResourceForm from './ResourceForm/ResourceForm.react';
-import { addResource, editResource, removeResource } from './Resources.actions';
-import './Resources.styles.scss';
+import { addResource, editResource, removeResource } from './ResourceTable.actions';
+import './ResourceTable.styles.scss';
 
 class Resources extends Component {
 
-    static defaultProps = {
-        resources: []
-    };
-
     state = {
-        resourceBeingAdded: '',
+        resourceBeingAdded: false,
         resourceBeingEdited: ''
     };
 
     addResource = (resource) => {
         this.props.addResource(resource);
         // todo: this assumes it was successful without checking
-        this.toggleEditResource();
+        this.toggleAddResource();
     };
 
-    // saveResourceBeingEdited = () => {
     editResource = (resource) => {
         this.props.editResource(resource);
         // todo: this assumes it was successful without checking
         this.toggleEditResource();
     };
 
-    toggleAddResource(resourceId = '') {
+    toggleAddResource = () => {
         this.setState({
-            resourceBeingAdded: resourceId
+            resourceBeingAdded: !this.state.resourceBeingAdded
         });
-    }
+    };
 
-    toggleEditResource(resourceId = '') {
+    toggleEditResource = (resourceId = '') => {
         this.setState({
-            resourceBeingEdited: resourceId
+            resourceBeingEdited: (resourceId !== this.state.resourceBeingEdited)
+                ? resourceId
+                : ''
         });
-    }
+    };
 
     render() {
         const resources = this.props.resources;
 
         return (
             <div>
+                <div>
+                    { this.props.isAdmin &&
+                        <i className="far fa-plus-square" onClick={this.toggleAddResource}></i>
+                    }
+                </div>
                 <table>
-                    <tbody>
+                    <thead>
                         <tr>
-                            {/* <th>Difficulty</th> */}
-                            {/* <th>Rating</th> */}
-                            {/* <th>Submitted By</th> */}
                             <th>Name</th>
                             <th>Description</th>
                             <th>Admin</th>
                         </tr>
-                        {this.props.resources && this.props.resources.map((resource) =>
+                    </thead>
+                    <tbody>
+                        {this.state.resourceBeingAdded && 
+                            <tr>
+                                <td>
+                                    <ResourceForm onSubmit={this.addResource} />
+                                </td>
+                            </tr>
+                        }
+                        {resources && resources.map((resource) =>
                             <tr key={resource.id}>
                                 {
                                     (this.state.resourceBeingEdited && resource.id === this.state.resourceBeingEdited)
@@ -72,10 +81,12 @@ class Resources extends Component {
                                             </Fragment>
                                         )
                                 }
-                                <td>
-                                    <i className='far fa-edit' onClick={this.toggleEditResource}></i>
-                                    <i className='far fa-trash-alt' onClick={() => this.props.removeResource(resource.id)}></i>
-                                </td>
+                                { this.props.isAdmin &&
+                                    <td>
+                                        <i className='far fa-edit' onClick={() => this.toggleEditResource(resource.id)}></i>
+                                        <i className='far fa-trash-alt' onClick={() => this.props.removeResource(resource.id)}></i>
+                                    </td>
+                                }
                             </tr>
                         )}
                     </tbody>
@@ -86,7 +97,8 @@ class Resources extends Component {
 };
 
 const mapStateToProps = state => ({
-    resources: state.firestore.ordered.resources
+    resources: state.firestore.ordered.resources,
+    isAdmin: isAdmin(state.firestore.ordered.permissions, state.firebase.auth.uid)
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -98,9 +110,7 @@ const mapDispatchToProps = dispatch => ({
 export default compose(
     connect(mapStateToProps, mapDispatchToProps),
     firestoreConnect([
-        {
-            collection: 'resources',
-            orderBy: ['createdAt', 'desc']
-        }
+        { collection: 'permissions' },
+        { collection: 'resources', orderBy: ['createdAt', 'desc'] }
     ])
 )(Resources);
