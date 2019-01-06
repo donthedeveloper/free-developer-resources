@@ -6,6 +6,7 @@ class ResourceForm extends Component {
         super(props);
         const resource = props.resource;
         this.state = {
+            category: resource ? resource.category : '',
             description: resource ? resource.description : '',
             name: resource ? resource.name : '',
             url: resource ? resource.url : ''
@@ -20,7 +21,16 @@ class ResourceForm extends Component {
 
     save = (e) => {
         e.preventDefault();
-        this.props.onSubmit(this.state);
+        const resource = this.props.resource;
+
+        const resourceToSave = {
+            ...this.state
+        };
+        if (resource) {
+            resourceToSave.id = resource.id
+        }
+
+        this.props.onSubmit(resourceToSave);
     };
 
     render() {
@@ -34,6 +44,18 @@ class ResourceForm extends Component {
                     type='text'
                     value={this.state.name}
                 />
+                <label htmlFor='category'>Category</label>
+                <select
+                    id='category'
+                    name='category'
+                    onChange={this.handleInputChange}
+                    value={this.state.category}
+                >
+                    <option value='ux'>UX & Design</option>
+                    <option value='frontend'>Frontend</option>
+                    <option value='backend'>Backend</option>
+                    <option value='foundations'>Foundations</option>
+                </select>
                 <label htmlFor='url'>URL</label>
                 <input
                     id='url'

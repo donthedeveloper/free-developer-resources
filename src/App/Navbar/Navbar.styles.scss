@@ -1,6 +1,12 @@
 .navbar {
     display: flex;
 
+    &__list {
+        display: flex;
+        list-style-type: none;
+        padding-left: 0;
+    }
+
     &__link {
         color: #000;
         padding: 1rem;

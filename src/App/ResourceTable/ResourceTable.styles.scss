@@ -1,15 +1,28 @@
-// .resources-navbar {
-//     display: flex;
+.resource-table {
+    background-color: #f2f2f2;
 
-//     &__link {
-//         padding: 1rem;
-//     }
-// }
+    &__header {
+        display: flex;
 
-// .resources-navbar-list {
-//     display: flex;
-//     list-style-type: none;
-//     padding-left: 0;
-// }
+        &--ux {
+            background-color: #8bc2eb;
+        }
 
-// ^^ I think the above is a subnavigation?
+        &--frontend {
+            background-color: #d41d53;
+        }
+
+        &--backend {
+            background-color: #3f6d63;
+        }
+
+        &--foundations {
+            background-color: #45393b;
+        }
+    }
+
+    &__heading {
+        margin-top: 0;
+        text-transform: uppercase;
+    }
+}
