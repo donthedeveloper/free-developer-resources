@@ -5,6 +5,11 @@
         display: flex;
         list-style-type: none;
         padding-left: 0;
+
+        // todo: temporary
+        @media (max-width: 479px) {
+            display: none;
+        }
     }
 
     &__link {

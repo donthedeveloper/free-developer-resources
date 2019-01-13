@@ -1,8 +1,9 @@
 .resource-table {
-    background-color: #f2f2f2;
+    background-color: #fff;
+    border-spacing: 0;
 
     &__header {
-        display: flex;
+        text-align: left;
 
         &--ux {
             background-color: #8bc2eb;
@@ -19,10 +20,63 @@
         &--foundations {
             background-color: #45393b;
         }
+
+        @media (max-width: 479px) {
+            display: none;
+        }
     }
 
-    &__heading {
-        margin-top: 0;
-        text-transform: uppercase;
+    &__row {
+        border-bottom: 1px solid #e6e6e6;
+        display: table-row;
+        flex-direction: row;
+        padding: 1rem;
+
+        @media (max-width: 479px) {
+            display: flex;
+            flex-direction: column;
+        }
     }
+
+    &__column {
+        padding: 1rem;
+        margin-top: 2rem;
+        position: relative;
+
+        &:before {
+            position: absolute;
+            top: -1rem;
+
+            @media (min-width: 480px) {
+                display: none;
+            }
+        }
+
+        &:first-of-type {
+            margin-top: 1rem;
+        }
+
+        &--header {
+            color: #fff;
+        }
+
+        &--name:before {
+            content: 'Name' 
+        }
+        &--category:before {
+            content: 'Category' 
+        }
+        &--description:before {
+            content: 'Description' 
+        }
+
+        @media (max-width: 479px) {
+            padding: 0;
+        }
+    }
+
+    // &__heading {
+    //     margin-top: 0;
+    //     text-transform: uppercase;
+    // }
 }

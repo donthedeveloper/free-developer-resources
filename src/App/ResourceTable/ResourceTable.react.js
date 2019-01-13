@@ -67,7 +67,7 @@ class Resources extends Component {
             ? this.filterResourcesbyCategory()
             : this.props.firestoreData.ordered.resources;
 
-        const tableHeaderClassName = classNames('resource-table__header', {
+        const tableHeaderClassName = classNames('resource-table__header', { // todo: the base 'resource-table__header' may not be needed
             'resource-table__header--ux': category === 'ux',
             'resource-table__header--frontend': category === 'frontend',
             'resource-table__header--backend': category === 'backend',
@@ -75,60 +75,50 @@ class Resources extends Component {
         });
 
         return (
-            <div className='resource-table'>
-                <div className={tableHeaderClassName}>
-                    {this.props.match.params.category
-                        && <h1 className='resource-table__heading'>{category} Resources</h1>
-                    }
-                    { isAdmin &&
-                        <i className="far fa-plus-square" onClick={this.toggleAddResource}></i>
-                    }
-                </div>
-                <table>
-                    <thead>
+            <table className='resource-table'>
+                <thead className={tableHeaderClassName}>
+                    <tr>
+                        <th className='resource-table__column resource-table__column--header'>Name</th>
+                        <th className='resource-table__column resource-table__column--header'>Category</th>
+                        { isAdmin && <th>URL</th> }
+                        <th className='resource-table__column resource-table__column--header'>Description</th>
+                        { isAdmin && <th>Admin</th> }
+                    </tr>
+                </thead>
+                <tbody>
+                    {this.state.resourceBeingAdded && 
                         <tr>
-                            <th>Name</th>
-                            <th>Category</th>
-                            { isAdmin && <th>URL</th> }
-                            <th>Description</th>
-                            <th>Admin</th>
+                            <td colSpan={numOfFormColumns}>
+                                <ResourceForm onSubmit={this.addResource} />
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        {this.state.resourceBeingAdded && 
-                            <tr>
-                                <td colSpan={numOfFormColumns}>
-                                    <ResourceForm onSubmit={this.addResource} />
+                    }
+                    {resources.map((resource) =>
+                        <tr className='resource-table__row' key={resource.id}>
+                            {
+                                (this.state.resourceBeingEdited && resource.id === this.state.resourceBeingEdited)
+                                    ? (
+                                        <td colSpan={numOfFormColumns}>
+                                            <ResourceForm resource={resource} onSubmit={this.editResource} />
+                                        </td>
+                                    ) : (
+                                        <Fragment>
+                                            <td className='resource-table__column resource-table__column--name'>{resource.name}</td>
+                                            <td className='resource-table__column resource-table__column--category'>{resource.category}</td>
+                                            <td className='resource-table__column resource-table__column--description'>{resource.description}</td>
+                                        </Fragment>
+                                    )
+                            }
+                            { isAdmin &&
+                                <td>
+                                    <i className='far fa-edit' onClick={() => this.toggleEditResource(resource.id)}></i>
+                                    <i className='far fa-trash-alt' onClick={() => this.props.removeResource(resource.id)}></i>
                                 </td>
-                            </tr>
-                        }
-                        {resources.map((resource) =>
-                            <tr key={resource.id}>
-                                {
-                                    (this.state.resourceBeingEdited && resource.id === this.state.resourceBeingEdited)
-                                        ? (
-                                            <td colSpan={numOfFormColumns}>
-                                                <ResourceForm resource={resource} onSubmit={this.editResource} />
-                                            </td>
-                                        ) : (
-                                            <Fragment>
-                                                <td>{resource.name}</td>
-                                                <td>{resource.category}</td>
-                                                <td>{resource.description}</td>
-                                            </Fragment>
-                                        )
-                                }
-                                { isAdmin &&
-                                    <td>
-                                        <i className='far fa-edit' onClick={() => this.toggleEditResource(resource.id)}></i>
-                                        <i className='far fa-trash-alt' onClick={() => this.props.removeResource(resource.id)}></i>
-                                    </td>
-                                }
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
+                            }
+                        </tr>
+                    )}
+                </tbody>
+            </table>
         );
     } 
 };
