@@ -67,7 +67,7 @@ class Resources extends Component {
             ? this.filterResourcesbyCategory()
             : this.props.firestoreData.ordered.resources;
 
-        const tableHeaderClassName = classNames('resource-table__header', { // todo: the base 'resource-table__header' may not be needed
+        const tableHeaderClassName = classNames({
             'resource-table__header--ux': category === 'ux',
             'resource-table__header--frontend': category === 'frontend',
             'resource-table__header--backend': category === 'backend',
