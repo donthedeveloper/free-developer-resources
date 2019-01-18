@@ -2,6 +2,12 @@ import React, { Component } from 'react';
 
 class ResourceForm extends Component {
 
+    static propTypes = {
+        resource: PropTypes.shape({
+            
+        })
+    }
+
     constructor(props) {
         super(props);
         const resource = props.resource;

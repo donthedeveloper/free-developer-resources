@@ -1,4 +1,5 @@
 import classNames from 'classnames';
+import PropTypes from 'prop-types';
 import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
 import { firestoreConnect } from 'react-redux-firebase';
@@ -10,6 +11,29 @@ import { addResource, editResource, removeResource } from './ResourceTable.actio
 import './ResourceTable.styles.scss';
 
 class Resources extends Component {
+
+    static propTypes = {
+        addResource: PropTypes.func.isRequired,
+        editResource: PropTypes.func.isRequired,
+        filterByCategory: PropTypes.bool,
+        firestoreData: PropTypes.shape({
+            status: PropTypes.shape({
+                requested: PropTypes.shape({
+                    resources: PropTypes.bool
+                }).isRequired
+            }),
+            ordered: PropTypes.shape({
+                resources: PropTypes.array
+            }).isRequired
+        }),
+        isAdmin: PropTypes.bool.isRequired,
+        match: PropTypes.shape({
+            params: PropTypes.shape({
+                category: PropTypes.string.isRequired
+            })
+        }),
+        removeResource: PropTypes.func.isRequired
+    }
 
     state = {
         resourceBeingAdded: false,
@@ -59,6 +83,8 @@ class Resources extends Component {
         if (!this.props.firestoreData.status.requested.resources) {
             return <i className="fas fa-spinner"></i>;
         }
+
+        console.log('props:', this.props);
 
         const category = this.props.match.params.category;
         const isAdmin = this.props.isAdmin;

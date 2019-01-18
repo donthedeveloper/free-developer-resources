@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 import { firestoreConnect } from 'react-redux-firebase';
@@ -22,6 +23,17 @@ const Admin = (props) => {
             <Redirect to={`${props.match.url}/resources`} />
         </Switch>
     );
+};
+
+Admin.defaultProps = {
+    isLoadingPermissions: false
+};
+
+Admin.propTypes = {
+    isAdmin: PropTypes.bool.isRequired,
+    match: PropTypes.shape({
+        url: PropTypes.string
+    })
 };
 
 const mapStateToProps = state => ({

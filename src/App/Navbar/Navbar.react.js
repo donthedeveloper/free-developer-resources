@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link, NavLink } from 'react-router-dom';
@@ -5,6 +6,15 @@ import { signOut } from '../Auth/Auth.actions';
 import './Navbar.styles.scss';
 
 class Navbar extends Component {
+
+    static propTypes = {
+        auth: PropTypes.shape({
+            uid: PropTypes.string
+        }).isRequired,
+        signOut: PropTypes.func.isRequired,
+        userInitials: PropTypes.string.isRequired
+    };
+
     handleLogoutClick = (e) => {
         e.preventDefault();
         this.props.signOut();

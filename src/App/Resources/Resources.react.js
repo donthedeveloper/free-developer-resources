@@ -1,7 +1,5 @@
+import PropTypes from 'prop-types';
 import React from 'react';
-import { connect } from 'react-redux';
-import { firestoreConnect } from 'react-redux-firebase';
-import { compose } from 'redux';
 import ResourceTable from '../ResourceTable/ResourceTable.react';
 import './Resources.styles.scss';
 
@@ -12,6 +10,14 @@ const Resources = (props) => {
             <ResourceTable filterByCategory />
         </div>
     );
+};
+
+Resources.propTypes = {
+    match: PropTypes.shape({
+        params: PropTypes.shape({
+            category: PropTypes.string.isRequired
+        })
+    })
 };
 
 export default Resources;
