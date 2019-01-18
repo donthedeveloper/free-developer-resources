@@ -16,8 +16,9 @@ const App = () => {
                 <Navbar />
                 <Switch>
                     <Route exact path='/resources' component={Categories} />
+                    <Route path='/resources/:category' component={Resources} />
                     <Route path='/admin' component={Admin} />
-                    <Route path='/profile' component={Profile} />
+                    {/* <Route path='/profile' component={Profile} /> */}
                     <Route path='/signin' component={SignIn} />
                     <Route path='/signup' component={Signup} />
                     <Redirect to='/resources' />

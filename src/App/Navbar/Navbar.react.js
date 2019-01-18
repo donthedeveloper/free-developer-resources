@@ -17,7 +17,7 @@ class Navbar extends Component {
         return (
             <nav className='navbar'>
                 <Link className='navbar__link' to='/'>Free Developer Resources</Link>
-                <ul className='navbar-list'>
+                <ul className='navbar__list'>
                     <li><NavLink className='navbar__link' to='/resources'>Resources</NavLink></li>
                     {!userIsLoggedIn &&
                         <li><NavLink className='navbar__link' to='/signup'>SignUp</NavLink></li>
@@ -25,9 +25,9 @@ class Navbar extends Component {
                     {!userIsLoggedIn &&
                         <li><NavLink className='navbar__link' to='/signin'>Login</NavLink></li>
                     }
-                    {userIsLoggedIn &&
+                    {/* {userIsLoggedIn &&
                         <li><NavLink className='navbar__link' to='/profile'>Profile</NavLink></li>
-                    }
+                    } */}
                     {userIsLoggedIn &&
                         <li>
                             <button

@@ -1,6 +1,8 @@
+import classNames from 'classnames';
 import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
 import { firestoreConnect } from 'react-redux-firebase';
+import { withRouter } from 'react-router-dom';
 import { compose } from 'redux';
 import { isAdmin } from '../Auth/Auth.utilities';
 import ResourceForm from './ResourceForm/ResourceForm.react';
@@ -30,6 +32,10 @@ class Resources extends Component {
         this.setState({
             resourceBeingAdded: !this.state.resourceBeingAdded
         });
+
+        if (this.state.resourceBeingEdited) {
+            this.toggleEditResource();
+        }
     };
 
     toggleEditResource = (resourceId = '') => {
@@ -38,66 +44,87 @@ class Resources extends Component {
                 ? resourceId
                 : ''
         });
+
+        if (this.state.resourceBeingAdded) {
+            this.toggleAddResource();
+        }
+    };
+
+    filterResourcesbyCategory = () => {
+        const category = this.props.match.params.category;
+        return this.props.firestoreData.ordered.resources.filter((resource) => resource.category === category);
     };
 
     render() {
-        const resources = this.props.resources;
+        if (!this.props.firestoreData.status.requested.resources) {
+            return <i className="fas fa-spinner"></i>;
+        }
+
+        const category = this.props.match.params.category;
+        const isAdmin = this.props.isAdmin;
+        const numOfFormColumns = isAdmin ? 4 : 3;
+        const resources = this.props.filterByCategory
+            ? this.filterResourcesbyCategory()
+            : this.props.firestoreData.ordered.resources;
+
+        const tableHeaderClassName = classNames({
+            'resource-table__header--ux': category === 'ux',
+            'resource-table__header--frontend': category === 'frontend',
+            'resource-table__header--backend': category === 'backend',
+            'resource-table__header--foundations': category === 'foundations'
+        });
 
         return (
-            <div>
-                <div>
-                    { this.props.isAdmin &&
-                        <i className="far fa-plus-square" onClick={this.toggleAddResource}></i>
-                    }
-                </div>
-                <table>
-                    <thead>
+            <table className='resource-table'>
+                <thead className={tableHeaderClassName}>
+                    <tr>
+                        <th className='resource-table__column resource-table__column--header'>Name</th>
+                        <th className='resource-table__column resource-table__column--header'>Category</th>
+                        { isAdmin && <th>URL</th> }
+                        <th className='resource-table__column resource-table__column--header'>Description</th>
+                        { isAdmin && <th>Admin</th> }
+                    </tr>
+                </thead>
+                <tbody>
+                    {this.state.resourceBeingAdded && 
                         <tr>
-                            <th>Name</th>
-                            <th>Description</th>
-                            <th>Admin</th>
+                            <td colSpan={numOfFormColumns}>
+                                <ResourceForm onSubmit={this.addResource} />
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        {this.state.resourceBeingAdded && 
-                            <tr>
+                    }
+                    {resources.map((resource) =>
+                        <tr className='resource-table__row' key={resource.id}>
+                            {
+                                (this.state.resourceBeingEdited && resource.id === this.state.resourceBeingEdited)
+                                    ? (
+                                        <td colSpan={numOfFormColumns}>
+                                            <ResourceForm resource={resource} onSubmit={this.editResource} />
+                                        </td>
+                                    ) : (
+                                        <Fragment>
+                                            <td className='resource-table__column resource-table__column--name'>{resource.name}</td>
+                                            <td className='resource-table__column resource-table__column--category'>{resource.category}</td>
+                                            <td className='resource-table__column resource-table__column--description'>{resource.description}</td>
+                                        </Fragment>
+                                    )
+                            }
+                            { isAdmin &&
                                 <td>
-                                    <ResourceForm onSubmit={this.addResource} />
+                                    <i className='far fa-edit' onClick={() => this.toggleEditResource(resource.id)}></i>
+                                    <i className='far fa-trash-alt' onClick={() => this.props.removeResource(resource.id)}></i>
                                 </td>
-                            </tr>
-                        }
-                        {resources && resources.map((resource) =>
-                            <tr key={resource.id}>
-                                {
-                                    (this.state.resourceBeingEdited && resource.id === this.state.resourceBeingEdited)
-                                        ? (
-                                            <td colSpan='2'>
-                                                <ResourceForm resource={resource} onSubmit={this.editResource} />
-                                            </td>
-                                        ) : (
-                                            <Fragment>
-                                                <td>{resource.name}</td>
-                                                <td>{resource.description}</td>
-                                            </Fragment>
-                                        )
-                                }
-                                { this.props.isAdmin &&
-                                    <td>
-                                        <i className='far fa-edit' onClick={() => this.toggleEditResource(resource.id)}></i>
-                                        <i className='far fa-trash-alt' onClick={() => this.props.removeResource(resource.id)}></i>
-                                    </td>
-                                }
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
+                            }
+                        </tr>
+                    )}
+                </tbody>
+            </table>
         );
     } 
 };
 
 const mapStateToProps = state => ({
-    resources: state.firestore.ordered.resources,
+    firestoreData: state.firestore,
     isAdmin: isAdmin(state.firestore.ordered.permissions, state.firebase.auth.uid)
 });
 
@@ -112,5 +139,6 @@ export default compose(
     firestoreConnect([
         { collection: 'permissions' },
         { collection: 'resources', orderBy: ['createdAt', 'desc'] }
-    ])
+    ]),
+    withRouter
 )(Resources);

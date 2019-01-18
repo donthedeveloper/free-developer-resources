@@ -6,18 +6,18 @@ export const addResource = (resource) =>
         })
             .then(() => dispatch({ type: 'ADD_RESOURCE_SUCCESS', resource }))
             .catch((error) => dispatch({ type: 'ADD_RESOURCE_ERROR', error }));
-            // .catch((error) => dispatch({ type: 'UPDATE_ERROR', error }));
-
 
 export const editResource = (resource) =>
-    (dispatch, getState, { getFirebase, getFirestore }) =>
+    (dispatch, getState, { getFirebase, getFirestore }) => {
             getFirestore().collection('resources').doc(resource.id).update({
+                category: resource.category,
                 description: resource.description,
                 name: resource.name,
                 url: resource.url
             })
                 .then(() => dispatch({ type: 'EDIT_RESOURCE_SUCCESS' }))
                 .catch((error) => dispatch({ type: 'EDIT_RESOURCE_ERROR', error }));
+        }
 
 export const removeResource = (resourceId) =>
     (dispatch, getState, { getFirebase, getFirestore }) =>
