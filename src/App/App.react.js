@@ -3,7 +3,7 @@ import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import Admin from './Admin/Admin.react';
 import Categories from './Categories/Categories.react';
 import Navbar from './Navbar/Navbar.react';
-import Profile from './Profile/Profile.react';
+// import Profile from './Profile/Profile.react';
 import Resources from './Resources/Resources.react';
 import SignIn from './SignIn/SignIn.react';
 import Signup from './Signup/Signup.react';

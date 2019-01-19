@@ -1,9 +1,16 @@
+import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 import { signUp } from '../Auth/Auth.actions';
 
 class Signup extends Component {
+
+    static propTypes = {
+        error: PropTypes.string,
+        isLoggedIn: PropTypes.bool.isRequired,
+        signUp: PropTypes.func.isRequired
+    }
 
     state = {
         email: '',
