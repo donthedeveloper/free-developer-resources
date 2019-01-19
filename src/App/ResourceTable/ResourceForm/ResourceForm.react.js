@@ -8,6 +8,7 @@ class ResourceForm extends Component {
         resource: PropTypes.shape({
             category: PropTypes.string,
             description: PropTypes.string,
+            difficulty: PropTypes.oneOf([1, 2, 3]),
             name: PropTypes.name,
             url: PropTypes.url
         })
@@ -17,8 +18,9 @@ class ResourceForm extends Component {
         super(props);
         const resource = props.resource;
         this.state = {
-            category: resource ? resource.category : '',
+            category: resource ? resource.category : 'frontend',
             description: resource ? resource.description : '',
+            difficulty: resource ? resource.difficulty : 1,
             name: resource ? resource.name : '',
             url: resource ? resource.url : ''
         }
@@ -42,6 +44,15 @@ class ResourceForm extends Component {
         }
 
         this.props.onSubmit(resourceToSave);
+        // todo: clear state mainly for adding a new resource
+        // todo: this assumes it was successful without checking
+        this.setState({
+            category: 'frontend',
+            description: '',
+            difficulty: 1,
+            name: '',
+            url: ''
+        })
     };
 
     render() {
@@ -66,6 +77,17 @@ class ResourceForm extends Component {
                     <option value='frontend'>Frontend</option>
                     <option value='backend'>Backend</option>
                     <option value='foundations'>Foundations</option>
+                </select>
+                <label htmlFor='difficulty'>Difficulty</label>
+                <select
+                    id='difficulty'
+                    name='difficulty'
+                    onChange={this.handleInputChange}
+                    value={this.state.difficulty}
+                >
+                    <option value='1'>Easy</option>
+                    <option value='2'>Intermediate</option>
+                    <option value='3'>Advanced</option>
                 </select>
                 <label htmlFor='url'>URL</label>
                 <input

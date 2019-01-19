@@ -58,6 +58,7 @@
 
         &--header {
             color: #fff;
+            text-align: left;
         }
 
         &--name:before {
@@ -68,6 +69,9 @@
         }
         &--description:before {
             content: 'Description' 
+        }
+        &--difficulty:before {
+            content: 'Difficulty'
         }
 
         @media (max-width: 479px) {

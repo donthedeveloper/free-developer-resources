@@ -36,14 +36,12 @@ class Resources extends Component {
     }
 
     state = {
-        resourceBeingAdded: false,
         resourceBeingEdited: ''
     };
 
     addResource = (resource) => {
         this.props.addResource(resource);
         // todo: this assumes it was successful without checking
-        this.toggleAddResource();
     };
 
     editResource = (resource) => {
@@ -52,15 +50,23 @@ class Resources extends Component {
         this.toggleEditResource();
     };
 
-    toggleAddResource = () => {
-        this.setState({
-            resourceBeingAdded: !this.state.resourceBeingAdded
-        });
-
-        if (this.state.resourceBeingEdited) {
-            this.toggleEditResource();
+    getDifficulty(num) {
+        let difficulty;
+        switch(num) {
+            case 1:
+                difficulty = 'Beginner';
+                break;
+            case 2:
+                difficulty = 'Intermediate';
+                break;
+            case 3:
+                difficulty = 'Advanced';
+                break;
+            default:
+                difficulty = 'N/A';
         }
-    };
+        return difficulty;
+    }
 
     toggleEditResource = (resourceId = '') => {
         this.setState({
@@ -68,10 +74,6 @@ class Resources extends Component {
                 ? resourceId
                 : ''
         });
-
-        if (this.state.resourceBeingAdded) {
-            this.toggleAddResource();
-        }
     };
 
     filterResourcesbyCategory = () => {
@@ -103,14 +105,17 @@ class Resources extends Component {
                 <thead className={tableHeaderClassName}>
                     <tr>
                         <th className='resource-table__column resource-table__column--header'>Name</th>
-                        <th className='resource-table__column resource-table__column--header'>Category</th>
-                        { isAdmin && <th>URL</th> }
+                        { isAdmin &&
+                            <th className='resource-table__column resource-table__column--header'>Category</th>
+                        }
+                        <th className='resource-table__column resource-table__column--header'>Difficulty</th>
+                        { isAdmin && <th className='resource-table__column resource-table__column--header'>URL</th> }
                         <th className='resource-table__column resource-table__column--header'>Description</th>
-                        { isAdmin && <th>Admin</th> }
+                        { isAdmin && <th className='resource-table__column resource-table__column--header'>Admin</th> }
                     </tr>
                 </thead>
                 <tbody>
-                    {this.state.resourceBeingAdded && 
+                    { isAdmin &&
                         <tr>
                             <td colSpan={numOfFormColumns}>
                                 <ResourceForm onSubmit={this.addResource} />
@@ -128,7 +133,13 @@ class Resources extends Component {
                                     ) : (
                                         <Fragment>
                                             <td className='resource-table__column resource-table__column--name'>{resource.name}</td>
-                                            <td className='resource-table__column resource-table__column--category'>{resource.category}</td>
+                                            { isAdmin &&
+                                                <td className='resource-table__column resource-table__column--category'>{resource.category}</td>
+                                            }
+                                            <td className='resource-table__column resource-table__column--difficulty'>{this.getDifficulty(resource.difficulty)}</td>
+                                            { isAdmin &&
+                                                <td className='resource-table__column resource-table__column--url'>{resource.url}</td>
+                                            }
                                             <td className='resource-table__column resource-table__column--description'>{resource.description}</td>
                                         </Fragment>
                                     )
