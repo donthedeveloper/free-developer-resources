@@ -1,10 +1,15 @@
+import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 
 class ResourceForm extends Component {
 
     static propTypes = {
+        onSubmit: PropTypes.func,
         resource: PropTypes.shape({
-            
+            category: PropTypes.string,
+            description: PropTypes.string,
+            name: PropTypes.name,
+            url: PropTypes.url
         })
     }
 

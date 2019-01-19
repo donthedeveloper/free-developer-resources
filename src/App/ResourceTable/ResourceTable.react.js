@@ -84,8 +84,6 @@ class Resources extends Component {
             return <i className="fas fa-spinner"></i>;
         }
 
-        console.log('props:', this.props);
-
         const category = this.props.match.params.category;
         const isAdmin = this.props.isAdmin;
         const numOfFormColumns = isAdmin ? 4 : 3;
