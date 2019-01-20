@@ -28,8 +28,6 @@
 
     &__row {
         border-bottom: 1px solid #e6e6e6;
-        display: table-row;
-        flex-direction: row;
         padding: 1rem;
 
         @media (max-width: 479px) {
@@ -58,8 +56,12 @@
 
         &--header {
             color: #fff;
+            text-align: left;
         }
 
+        &--admin:before {
+            content: 'Admin'
+        }
         &--name:before {
             content: 'Name' 
         }
@@ -68,6 +70,12 @@
         }
         &--description:before {
             content: 'Description' 
+        }
+        &--difficulty:before {
+            content: 'Difficulty'
+        }
+        &--url:before {
+            content: 'URL'
         }
 
         @media (max-width: 479px) {
