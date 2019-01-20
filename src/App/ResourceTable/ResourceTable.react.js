@@ -88,12 +88,12 @@ class Resources extends Component {
 
         const category = this.props.match.params.category;
         const isAdmin = this.props.isAdmin;
-        const numOfFormColumns = isAdmin ? 4 : 3;
+        const numOfFormColumns = isAdmin ? 6 : 3;
         const resources = this.props.filterByCategory
             ? this.filterResourcesbyCategory()
             : this.props.firestoreData.ordered.resources;
 
-        const tableHeaderClassName = classNames({
+        const tableHeaderClassName = classNames('resource-table__header', {
             'resource-table__header--ux': category === 'ux',
             'resource-table__header--frontend': category === 'frontend',
             'resource-table__header--backend': category === 'backend',
@@ -145,7 +145,7 @@ class Resources extends Component {
                                     )
                             }
                             { isAdmin &&
-                                <td>
+                                <td className='resource-table__column resource-table__column--admin'>
                                     <i className='far fa-edit' onClick={() => this.toggleEditResource(resource.id)}></i>
                                     <i className='far fa-trash-alt' onClick={() => this.props.removeResource(resource.id)}></i>
                                 </td>
