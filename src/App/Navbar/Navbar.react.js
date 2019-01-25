@@ -1,8 +1,9 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { firestoreConnect } from 'react-redux-firebase';
 import { Link, NavLink } from 'react-router-dom';
-import { signOut } from '../Auth/Auth.actions';
+import { compose } from 'redux';
 import './Navbar.styles.scss';
 
 class Navbar extends Component {
@@ -11,13 +12,15 @@ class Navbar extends Component {
         auth: PropTypes.shape({
             uid: PropTypes.string
         }).isRequired,
-        signOut: PropTypes.func.isRequired,
+        firebase: PropTypes.shape({
+            auth: PropTypes.func.isRequired
+        }),
         userInitials: PropTypes.string.isRequired
     };
 
     handleLogoutClick = (e) => {
         e.preventDefault();
-        this.props.signOut();
+        this.props.firebase.auth().signOut();
     };
 
     render() {
@@ -66,8 +69,7 @@ const mapStateToProps = state => {
     }
 }
 
-const mapDispatchToProps = dispatch => ({
-    signOut: () => dispatch(signOut())
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(Navbar);
+export default compose(
+    connect(mapStateToProps),
+    firestoreConnect()
+)(Navbar);

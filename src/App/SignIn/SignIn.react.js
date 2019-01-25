@@ -2,18 +2,22 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
-import { signIn } from '../Auth/Auth.actions';
+import { firestoreConnect } from 'react-redux-firebase';
+import { compose } from 'redux';
 
 class SignIn extends Component {
 
     static propTypes = {
         error: PropTypes.string,
+        firebase: PropTypes.shape({
+            auth: PropTypes.func.isRequired
+        }),
         isLoggedIn: PropTypes.bool.isRequired,
-        signIn: PropTypes.func.isRequired
     }
 
     state = {
         email: '',
+        error: '',
         password: ''
     }
 
@@ -25,7 +29,13 @@ class SignIn extends Component {
 
     handleSubmit = (e) => {
         e.preventDefault();
-        this.props.signIn(this.state);
+        const { email, password } = this.state;
+        this.props.firebase.auth().signInWithEmailAndPassword(email, password)
+            .catch(({ message }) => {
+                this.setState({
+                    error: message
+                });
+            });
     };
 
     render() {
@@ -36,7 +46,7 @@ class SignIn extends Component {
         return (
             <div>
                 <h1>Sign In</h1>
-                <p>{this.props.error}</p>
+                <p>{this.state.error}</p>
                 <form onSubmit={this.handleSubmit}>
                     <label htmlFor='email'>Email</label>
                     <input
@@ -60,12 +70,10 @@ class SignIn extends Component {
 }
 
 const mapStateToProps = state => ({
-    error: state.auth.error,
     isLoggedIn: !!state.firebase.auth.uid
 });
 
-const mapDispatchToProps = dispatch => ({
-    signIn: credentials => dispatch(signIn(credentials))
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(SignIn);
+export default compose(
+    connect(mapStateToProps),
+    firestoreConnect()
+)(SignIn);

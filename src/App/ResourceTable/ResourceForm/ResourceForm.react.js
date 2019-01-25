@@ -32,8 +32,9 @@ class ResourceForm extends Component {
     }
 
     handleInputChange = (e) => {
+        const { name, value } = e.target;
         this.setState({
-            [e.target.name]: e.target.value
+            [name]: name === 'difficulty' ? Number(value) : value
         });
     };
 
@@ -60,9 +61,13 @@ class ResourceForm extends Component {
         e.preventDefault();
         const resource = this.props.resource;
 
-        const resourceToSave = {
-            ...this.state
-        };
+        const { error, ...resourceToSave } = this.state;
+
+        // const resourceToSave = {
+        //     // error,
+        //     ...this.state
+        // };
+        // delete resourceToSave.error;
         if (resource) {
             resourceToSave.id = resource.id
         }
