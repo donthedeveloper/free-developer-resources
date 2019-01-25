@@ -69,7 +69,6 @@ class Resources extends Component {
     };
 
     getDifficulty(num) {
-        console.log(typeof num, num);
         switch(num) {
             case 1:
                 return 'Beginner';
