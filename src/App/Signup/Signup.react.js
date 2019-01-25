@@ -1,19 +1,26 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { firestoreConnect } from 'react-redux-firebase';
 import { Redirect } from 'react-router-dom';
-import { signUp } from '../Auth/Auth.actions';
+import { compose } from 'redux';
 
 class Signup extends Component {
 
     static propTypes = {
         error: PropTypes.string,
-        isLoggedIn: PropTypes.bool.isRequired,
-        signUp: PropTypes.func.isRequired
+        firebase: PropTypes.shape({
+            auth: PropTypes.func.isRequired
+        }),
+        firestore: PropTypes.shape({
+            collection: PropTypes.func.isRequired
+        }),
+        isLoggedIn: PropTypes.bool.isRequired
     }
 
     state = {
         email: '',
+        error: '',
         firstName: '',
         lastName: '',
         password: ''
@@ -27,20 +34,28 @@ class Signup extends Component {
 
     handleSubmit = (e) => {
         e.preventDefault();
-        this.props.signUp(this.state);
+        const { firebase, firestore } = this.props;
+        const { email, firstName, lastName, password } = this.state;
+        firebase.auth().createUserWithEmailAndPassword(email, password)
+            .then((response) => {
+                return firestore.collection('users').doc(response.user.uid).set({ firstName, lastName })
+            })
+            .catch(({ message }) => {
+                this.setState({
+                    error: message
+                });
+            });
     };
 
     render() {
-        const { error, isLoggedIn } = this.props;
-
-        if (isLoggedIn) {
+        if (this.props.isLoggedIn) {
             return <Redirect to='/' />
         }
 
         return (
             <div>
                 <h1>Signup</h1>
-                <p>{error}</p>
+                <p>{this.state.error}</p>
                 <form onSubmit={this.handleSubmit}>
                     <label htmlFor='firstName'>First Name</label>
                     <input
@@ -78,12 +93,10 @@ class Signup extends Component {
 }
 
 const mapStateToProps = state => ({
-    error: state.auth.error,
     isLoggedIn: !!state.firebase.auth.uid
 });
 
-const mapDispatchToProps = dispatch => ({
-    signUp: newUser => dispatch(signUp(newUser))
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(Signup);
+export default compose(
+    connect(mapStateToProps),
+    firestoreConnect()
+)(Signup);

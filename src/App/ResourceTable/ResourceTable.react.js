@@ -7,15 +7,15 @@ import { withRouter } from 'react-router-dom';
 import { compose } from 'redux';
 import { isAdmin } from '../Auth/Auth.utilities';
 import ResourceForm from './ResourceForm/ResourceForm.react';
-import { addResource, editResource, removeResource } from './ResourceTable.actions';
 import './ResourceTable.styles.scss';
 
 class Resources extends Component {
 
     static propTypes = {
-        addResource: PropTypes.func.isRequired,
-        editResource: PropTypes.func.isRequired,
         filterByCategory: PropTypes.bool,
+        firestore: PropTypes.shape({
+            collection: PropTypes.func.isRequired
+        }),
         firestoreData: PropTypes.shape({
             status: PropTypes.shape({
                 requested: PropTypes.shape({
@@ -29,10 +29,9 @@ class Resources extends Component {
         isAdmin: PropTypes.bool.isRequired,
         match: PropTypes.shape({
             params: PropTypes.shape({
-                category: PropTypes.string.isRequired
+                category: PropTypes.string
             })
-        }),
-        removeResource: PropTypes.func.isRequired
+        })
     }
 
     state = {
@@ -40,32 +39,54 @@ class Resources extends Component {
     };
 
     addResource = (resource) => {
-        this.props.addResource(resource);
-        // todo: this assumes it was successful without checking
+        this.props.firestore.collection('resources').add({
+            ...resource,
+            createdAt: new Date()
+        })
+        .catch((error) => {
+            console.error(error);
+        });
     };
 
     editResource = (resource) => {
-        this.props.editResource(resource);
-        // todo: this assumes it was successful without checking
-        this.toggleEditResource();
+        this.props.firestore.collection('resources').doc(resource.id).update({
+            category: resource.category,
+            description: resource.description,
+            name: resource.name,
+            url: resource.url
+        })
+            .then(() => {
+                this.toggleEditResource();
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    };
+
+    filterResourcesbyCategory = () => {
+        const category = this.props.match.params.category;
+        return this.props.firestoreData.ordered.resources.filter((resource) => resource.category === category);
     };
 
     getDifficulty(num) {
-        let difficulty;
+        console.log(typeof num, num);
         switch(num) {
             case 1:
-                difficulty = 'Beginner';
-                break;
+                return 'Beginner';
             case 2:
-                difficulty = 'Intermediate';
-                break;
+                return 'Intermediate';
             case 3:
-                difficulty = 'Advanced';
-                break;
+                return 'Advanced';
             default:
-                difficulty = 'N/A';
+                return 'N/A';
         }
-        return difficulty;
+    }
+
+    removeResource(resourceId) {
+        this.props.firestore.collection('resources').doc(resourceId).delete()
+            .catch((error) => {
+                console.error(error);
+            });
     }
 
     toggleEditResource = (resourceId = '') => {
@@ -74,11 +95,6 @@ class Resources extends Component {
                 ? resourceId
                 : ''
         });
-    };
-
-    filterResourcesbyCategory = () => {
-        const category = this.props.match.params.category;
-        return this.props.firestoreData.ordered.resources.filter((resource) => resource.category === category);
     };
 
     render() {
@@ -147,7 +163,7 @@ class Resources extends Component {
                             { isAdmin &&
                                 <td className='resource-table__column resource-table__column--admin'>
                                     <i className='far fa-edit' onClick={() => this.toggleEditResource(resource.id)}></i>
-                                    <i className='far fa-trash-alt' onClick={() => this.props.removeResource(resource.id)}></i>
+                                    <i className='far fa-trash-alt' onClick={() => this.removeResource(resource.id)}></i>
                                 </td>
                             }
                         </tr>
@@ -163,14 +179,8 @@ const mapStateToProps = state => ({
     isAdmin: isAdmin(state.firestore.ordered.permissions, state.firebase.auth.uid)
 });
 
-const mapDispatchToProps = dispatch => ({
-    addResource: resource => dispatch(addResource(resource)),
-    removeResource: (resourceId) => dispatch(removeResource(resourceId)),
-    editResource: (resource) => dispatch(editResource(resource))
-});
-
 export default compose(
-    connect(mapStateToProps, mapDispatchToProps),
+    connect(mapStateToProps),
     firestoreConnect([
         { collection: 'permissions' },
         { collection: 'resources', orderBy: ['createdAt', 'desc'] }
