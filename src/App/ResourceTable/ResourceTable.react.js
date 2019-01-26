@@ -49,7 +49,6 @@ class Resources extends Component {
     };
 
     editResource = (resource) => {
-        console.log('resource:', resource);
         this.props.firestore.collection('resources').doc(resource.id).update({
             category: resource.category,
             description: resource.description,
