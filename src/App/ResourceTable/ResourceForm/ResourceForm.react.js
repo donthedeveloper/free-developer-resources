@@ -60,11 +60,11 @@ class ResourceForm extends Component {
     save = (e) => {
         e.preventDefault();
         const resource = this.props.resource;
+        const { error, ...resourceToSave } = this.state;
         if (resource) {
             resourceToSave.id = resource.id
         }
 
-        const { error, ...resourceToSave } = this.state;
         if (this.isResourceNameDuplicate()) {
             this.setState({
                 error: 'Resource name should be unique.'

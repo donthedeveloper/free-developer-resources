@@ -52,6 +52,7 @@ class Resources extends Component {
         this.props.firestore.collection('resources').doc(resource.id).update({
             category: resource.category,
             description: resource.description,
+            difficulty: resource.difficulty,
             name: resource.name,
             url: resource.url
         })
