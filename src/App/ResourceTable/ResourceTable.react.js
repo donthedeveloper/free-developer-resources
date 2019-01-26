@@ -82,11 +82,13 @@ class Resources extends Component {
         }
     }
 
-    removeResource(resourceId) {
-        this.props.firestore.collection('resources').doc(resourceId).delete()
-            .catch((error) => {
-                console.error(error);
-            });
+    removeResource(resource) {
+        if (window.confirm(`Are you sure you want to delete the resource: ${resource.name}`)) {
+            this.props.firestore.collection('resources').doc(resource.id).delete()
+                .catch((error) => {
+                    console.error(error);
+                });
+        }
     }
 
     toggleEditResource = (resourceId = '') => {
@@ -104,7 +106,7 @@ class Resources extends Component {
 
         const category = this.props.match.params.category;
         const isAdmin = this.props.isAdmin;
-        const numOfFormColumns = isAdmin ? 6 : 3;
+        const numOfFormColumns = isAdmin ? 5 : 3;
         const resources = this.props.filterByCategory
             ? this.filterResourcesbyCategory()
             : this.props.firestoreData.ordered.resources;
@@ -163,7 +165,7 @@ class Resources extends Component {
                             { isAdmin &&
                                 <td className='resource-table__column resource-table__column--admin'>
                                     <i className='far fa-edit' onClick={() => this.toggleEditResource(resource.id)}></i>
-                                    <i className='far fa-trash-alt' onClick={() => this.removeResource(resource.id)}></i>
+                                    <i className='far fa-trash-alt' onClick={() => this.removeResource(resource)}></i>
                                 </td>
                             }
                         </tr>
