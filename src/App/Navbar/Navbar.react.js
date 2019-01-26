@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { firestoreConnect } from 'react-redux-firebase';
 import { Link, NavLink } from 'react-router-dom';
 import { compose } from 'redux';
+import { isAdmin } from '../Auth/Auth.utilities';
 import './Navbar.styles.scss';
 
 class Navbar extends Component {
@@ -15,6 +16,7 @@ class Navbar extends Component {
         firebase: PropTypes.shape({
             auth: PropTypes.func.isRequired
         }),
+        isAdmin: PropTypes.bool.isRequired,
         userInitials: PropTypes.string.isRequired
     };
 
@@ -25,23 +27,23 @@ class Navbar extends Component {
 
     render() {
         const auth = this.props.auth;
-        const userIsLoggedIn = !!auth.uid;
+        const isLoggedIn = !!auth.uid;
 
         return (
             <nav className='navbar'>
                 <Link className='navbar__link' to='/'>Free Developer Resources</Link>
                 <ul className='navbar__list'>
                     <li><NavLink className='navbar__link' to='/resources'>Resources</NavLink></li>
-                    {!userIsLoggedIn &&
+                    { !isLoggedIn &&
                         <li><NavLink className='navbar__link' to='/signup'>SignUp</NavLink></li>
                     }
-                    {!userIsLoggedIn &&
+                    { !isLoggedIn &&
                         <li><NavLink className='navbar__link' to='/signin'>Login</NavLink></li>
                     }
                     {/* {userIsLoggedIn &&
                         <li><NavLink className='navbar__link' to='/profile'>Profile</NavLink></li>
                     } */}
-                    {userIsLoggedIn &&
+                    { isLoggedIn &&
                         <li>
                             <button
                                 className='navbar__link'
@@ -51,7 +53,9 @@ class Navbar extends Component {
                             </button>
                         </li>
                     }
-                    <li><NavLink className='navbar__link' to='/admin'>Admin</NavLink></li>
+                    { this.props.isAdmin &&
+                        <li><NavLink className='navbar__link' to='/admin'>Admin</NavLink></li>
+                    }
                     <li>{this.props.userInitials}</li>
                 </ul>
             </nav>
@@ -65,11 +69,12 @@ const mapStateToProps = state => {
     const lastInitial = lastName ? lastName[0].toUpperCase() : '';
     return {
         auth: state.firebase.auth,
+        isAdmin: isAdmin(state.firestore.ordered.permissions, state.firebase.auth.uid),
         userInitials: firstInitial + lastInitial
     }
 }
 
 export default compose(
     connect(mapStateToProps),
-    firestoreConnect()
+    firestoreConnect([{ collection: 'permissions' }])
 )(Navbar);
