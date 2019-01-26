@@ -8,6 +8,11 @@ import { compose } from 'redux';
 class ResourceForm extends Component {
 
     static propTypes = {
+        match: PropTypes.shape({
+            params: PropTypes.shape({
+                category: PropTypes.string
+            })
+        }),
         onSubmit: PropTypes.func,
         resource: PropTypes.shape({
             category: PropTypes.string,
@@ -22,12 +27,24 @@ class ResourceForm extends Component {
         super(props);
         const resource = props.resource;
         this.state = {
-            category: resource ? resource.category : 'frontend',
+            category: this.getCategory(),
             description: resource ? resource.description : '',
             difficulty: resource ? resource.difficulty : 1,
             error: '',
             name: resource ? resource.name : '',
             url: resource ? resource.url : ''
+        }
+    }
+
+    getCategory() {
+        const categoryFromParams = this.props.match.params.category;
+        const resourceBeingEdited = this.props.resource;
+        if (resourceBeingEdited) {
+            return resourceBeingEdited.category;
+        } else if (categoryFromParams) {
+            return categoryFromParams;
+        } else {
+            return 'frontend'
         }
     }
 
