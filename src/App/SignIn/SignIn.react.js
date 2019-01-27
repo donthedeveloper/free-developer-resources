@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Redirect } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import { firestoreConnect } from 'react-redux-firebase';
 import { compose } from 'redux';
 
@@ -64,6 +64,7 @@ class SignIn extends Component {
                     />
                     <button type='submit'>Log In</button>
                 </form>
+                <Link to='/forgot-password'>Forgot Password</Link>
             </div>
         )
     }
