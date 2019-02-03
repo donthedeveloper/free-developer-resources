@@ -8,8 +8,11 @@ class Profile extends Component {
 
     state = {
         email: '',
+        error: '',
         firstName: '',
-        lastName: ''
+        lastName: '',
+        oldPassword: '',
+        password: ''
     }
 
     getSnapshotBeforeUpdate(prevProps) {
@@ -42,6 +45,28 @@ class Profile extends Component {
         });
     };
 
+    handleEmailUpdate = (e) => {
+
+    };
+
+    handlePasswordUpdate = (e) => {
+
+    };
+
+    handleProfileUpdate = async (e) => {
+        e.preventDefault();
+        const { firebase, firestore, user } = this.props;
+        const { email, firstName, lastName, password } = this.state;
+        try {
+            await firebase.auth().currentUser.updateEmail(email);
+            firestore.collection('users').doc(user.uid).set({ firstName, lastName })
+        } catch ({message}) {
+            this.setState({
+                error: message
+            });
+        }
+    };
+
     render() {
         if (!this.props.user.isLoaded) {
             return <i className="fas fa-spinner"></i>;
@@ -55,7 +80,20 @@ class Profile extends Component {
             <div>
                 <h1>Edit Profile</h1>
                 <p>{this.state.error}</p>
-                <form onSubmit={this.handleSubmit}>
+
+                <form onSubmit={this.handleEmailUpdate}>
+                    <label htmlFor='email'>Email</label>
+                    <input
+                        id='email'
+                        name='email'
+                        onChange={this.handleInputChange}
+                        type='text'
+                        value={this.state.email}
+                    />
+                    <button type='submit'>Update Profile</button>
+                </form>
+
+                <form onSubmit={this.handleProfileUpdate}>
                     <label htmlFor='firstName'>First Name</label>
                     <input
                         id='firstName'
@@ -80,6 +118,17 @@ class Profile extends Component {
                         type='text'
                         value={this.state.email}
                     />
+                    <button type='submit'>Update Profile</button>
+                </form>
+
+                <form>
+                    <label htmlFor='oldPassword'>Old Password</label>
+                    <input
+                        id='oldPassword'
+                        name='oldPassword'
+                        onChange={this.handleInputChange}
+                        type='password'
+                    />
                     <label htmlFor='password'>Password</label>
                     <input
                         id='password'
@@ -87,7 +136,13 @@ class Profile extends Component {
                         onChange={this.handleInputChange}
                         type='password'
                     />
-                    <button type='submit'>Sign Up</button>
+                    <label htmlFor='password'>Confirm Password</label>
+                    <input
+                        id='confirmPassword'
+                        name='confirmPassword'
+                        onChange={this.handleInputChange}
+                        type='password'
+                    />
                 </form>
             </div>
         );
