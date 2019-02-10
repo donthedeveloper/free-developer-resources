@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
 import { firestoreConnect } from 'react-redux-firebase';
 import { Redirect } from 'react-router-dom';
@@ -7,12 +7,17 @@ import { compose } from 'redux';
 class Profile extends Component {
 
     state = {
+        // most likely will be managed in modal
+        currentPassword: '',
+        currentPasswordError: '',
+
         email: '',
         error: '',
         firstName: '',
         lastName: '',
         oldPassword: '',
-        password: ''
+        newPassword: '',
+        showPasswordField: false
     }
 
     getSnapshotBeforeUpdate(prevProps) {
@@ -53,16 +58,49 @@ class Profile extends Component {
 
     };
 
+    handleReauthenticate = (e) => {
+        e.preventDefault();
+        const { firebase, user } = this.props;
+        const credentials = firebase.auth.EmailAuthProvider.credential(user.email, this.state.currentPassword);
+
+        firebase.auth().currentUser.reauthenticateAndRetrieveDataWithCredential(credentials)
+            .then(() => {
+                this.setState({
+                    showPasswordField: false
+                }, () => {
+                    this.handleProfileUpdate();
+                });
+            })
+            .catch((error) => {
+                this.setState({
+                    currentPasswordError: error.message
+                });
+            });
+    };
+
     handleProfileUpdate = async (e) => {
         e.preventDefault();
         const { firebase, firestore, user } = this.props;
-        const { email, firstName, lastName, password } = this.state;
+        const { email, firstName, lastName} = this.state;
         try {
-            await firebase.auth().currentUser.updateEmail(email);
-            firestore.collection('users').doc(user.uid).set({ firstName, lastName })
-        } catch ({message}) {
+            if (user.email !== email) {
+                await firebase.auth().currentUser.updateEmail(email);
+            }
+            await firestore.collection('users').doc(user.uid).set({ firstName, lastName });
+
             this.setState({
-                error: message
+                currentPasswordError: '',
+                error: ''
+            })
+        } catch (error) {
+            console.log('error:', error);
+            if (error.code === 'auth/requires-recent-login') {
+                return this.setState({
+                    showPasswordField: true
+                });
+            }
+            this.setState({
+                error: error.message
             });
         }
     };
@@ -80,8 +118,26 @@ class Profile extends Component {
             <div>
                 <h1>Edit Profile</h1>
                 <p>{this.state.error}</p>
+                <p>{this.state.currentPasswordError}</p>
 
-                <form onSubmit={this.handleEmailUpdate}>
+                {/* turn this into a modal as its own form that will recall handleProfileUpdate on success and have its own error message */}
+                {this.state.showPasswordField &&
+                    <Fragment>
+                        <p>{this.state.error}</p>
+                        <form onSubmit={this.handleReauthenticate}>
+                            <input
+                                id='currentPassword'
+                                name='currentPassword'
+                                onChange={this.handleInputChange}
+                                type='password'
+                                value={this.state.currentPassword}
+                            />
+                            <input type='submit' value='Confirm Password' />
+                        </form>
+                    </Fragment>
+                }
+
+                <form onSubmit={this.handleProfileUpdate}>
                     <label htmlFor='email'>Email</label>
                     <input
                         id='email'
@@ -90,10 +146,6 @@ class Profile extends Component {
                         type='text'
                         value={this.state.email}
                     />
-                    <button type='submit'>Update Profile</button>
-                </form>
-
-                <form onSubmit={this.handleProfileUpdate}>
                     <label htmlFor='firstName'>First Name</label>
                     <input
                         id='firstName'
@@ -110,14 +162,6 @@ class Profile extends Component {
                         type='text'
                         value={this.state.lastName}
                     />
-                    <label htmlFor='email'>Email</label>
-                    <input
-                        id='email'
-                        name='email'
-                        onChange={this.handleInputChange}
-                        type='text'
-                        value={this.state.email}
-                    />
                     <button type='submit'>Update Profile</button>
                 </form>
 
@@ -131,8 +175,8 @@ class Profile extends Component {
                     />
                     <label htmlFor='password'>Password</label>
                     <input
-                        id='password'
-                        name='password'
+                        id='newPassword'
+                        name='newPassword'
                         onChange={this.handleInputChange}
                         type='password'
                     />
