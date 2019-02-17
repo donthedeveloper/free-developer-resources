@@ -20,28 +20,20 @@ class Profile extends Component {
         showPasswordField: false
     }
 
-    getSnapshotBeforeUpdate(prevProps) {
-        const user = this.props.user;
+    componentDidUpdate(prevProps) {
+        const {userProfile, user} = this.props;
         const userIsLoaded = user.isLoaded;
 
-        const state = {};
-        if (!prevProps.user.isLoaded && userIsLoaded) {
-            state.email = user.email;
-        } 
-
-        const profile = this.props.userProfile;
-        if (!prevProps.userProfile.isLoaded && profile.isLoaded) {
-            state.firstName = profile.firstName;
-            state.lastName = profile.lastName;
+        if (
+            (!prevProps.user.isLoaded && userIsLoaded) ||
+            (!prevProps.userProfile.isLoaded && userProfile.isLoaded)
+        ) {
+            this.setProfileInformationIfAuthenticated();
         }
-
-        return Object.keys(state).length ? state : null;
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        if (snapshot) {
-            this.setState(snapshot);
-        }
+    componentDidMount() {
+        this.setProfileInformationIfAuthenticated();
     }
 
     handleInputChange = (e) => {
@@ -66,9 +58,10 @@ class Profile extends Component {
         firebase.auth().currentUser.reauthenticateAndRetrieveDataWithCredential(credentials)
             .then(() => {
                 this.setState({
+                    currentPasswordError: '',
                     showPasswordField: false
                 }, () => {
-                    this.handleProfileUpdate();
+                    this.updateEmailAndProfileInformation();
                 });
             })
             .catch((error) => {
@@ -78,8 +71,13 @@ class Profile extends Component {
             });
     };
 
-    handleProfileUpdate = async (e) => {
+    handleProfileUpdate = (e) => {
         e.preventDefault();
+        this.updateEmailAndProfileInformation();
+    };
+
+    // handleProfileUpdate = async (e) => {
+    updateEmailAndProfileInformation = async () => {
         const { firebase, firestore, user } = this.props;
         const { email, firstName, lastName} = this.state;
         try {
@@ -104,6 +102,25 @@ class Profile extends Component {
             });
         }
     };
+
+    setProfileInformationIfAuthenticated() {
+        const {userProfile, user} = this.props;
+        const userIsLoaded = user.isLoaded;
+
+        const stateToSet = {};
+        if (userIsLoaded) {
+            stateToSet.email = user.email;
+        }
+
+        if (userProfile.isLoaded) {
+            stateToSet.firstName = userProfile.firstName;
+            stateToSet.lastName = userProfile.lastName;
+        }
+
+        if (Object.keys(stateToSet).length) {
+            this.setState(stateToSet);
+        }
+    }
 
     render() {
         if (!this.props.user.isLoaded) {
