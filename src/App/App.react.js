@@ -8,12 +8,17 @@ import Navbar from './Navbar/Navbar.react';
 import Resources from './Resources/Resources.react';
 import SignIn from './SignIn/SignIn.react';
 import Signup from './Signup/Signup.react';
-import './App.styles.scss';
+import './App.scss';
+
+import Modal from './Modal/Modal.react';
 
 const App = () => {
     return (
         <BrowserRouter>
             <div className='app'>
+                <Modal>
+                    Yay I exist!
+                </Modal>
                 <Navbar />
                 <Switch>
                     <Route exact path='/resources' component={Categories} />
