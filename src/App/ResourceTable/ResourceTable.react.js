@@ -7,7 +7,7 @@ import { withRouter } from 'react-router-dom';
 import { compose } from 'redux';
 import { isAdmin } from '../Auth/Auth.utilities';
 import ResourceForm from './ResourceForm/ResourceForm.react';
-import './ResourceTable.styles.scss';
+import './ResourceTable.scss';
 
 class Resources extends Component {
 

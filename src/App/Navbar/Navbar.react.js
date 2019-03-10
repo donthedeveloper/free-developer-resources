@@ -5,7 +5,7 @@ import { firestoreConnect } from 'react-redux-firebase';
 import { Link, NavLink } from 'react-router-dom';
 import { compose } from 'redux';
 import { isAdmin } from '../Auth/Auth.utilities';
-import './Navbar.styles.scss';
+import './Navbar.scss';
 
 class Navbar extends Component {
 
