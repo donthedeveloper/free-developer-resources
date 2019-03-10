@@ -40,9 +40,9 @@ class Navbar extends Component {
                     { !isLoggedIn &&
                         <li><NavLink className='navbar__link' to='/signin'>Login</NavLink></li>
                     }
-                    {/* {userIsLoggedIn &&
+                    { isLoggedIn &&
                         <li><NavLink className='navbar__link' to='/profile'>Profile</NavLink></li>
-                    } */}
+                    }
                     { isLoggedIn &&
                         <li>
                             <button

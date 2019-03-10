@@ -4,7 +4,7 @@ import Admin from './Admin/Admin.react';
 import Categories from './Categories/Categories.react';
 import ForgotPassword from './ForgotPassword/ForgotPassword.react';
 import Navbar from './Navbar/Navbar.react';
-// import Profile from './Profile/Profile.react';
+import Profile from './Profile/Profile.react';
 import Resources from './Resources/Resources.react';
 import SignIn from './SignIn/SignIn.react';
 import Signup from './Signup/Signup.react';
@@ -22,12 +22,12 @@ const App = () => {
                 <Navbar />
                 <Switch>
                     <Route exact path='/resources' component={Categories} />
-                    <Route path='/resources/:category' component={Resources} />
                     <Route path='/admin' component={Admin} />
-                    {/* <Route path='/profile' component={Profile} /> */}
+                    <Route path='/forgot-password' component={ForgotPassword} />
+                    <Route path='/profile' component={Profile} />
+                    <Route path='/resources/:category' component={Resources} />
                     <Route path='/signin' component={SignIn} />
                     <Route path='/signup' component={Signup} />
-                    <Route path='/forgot-password' component={ForgotPassword} />
                     <Redirect to='/resources' />
                 </Switch>
             </div>
