@@ -1,23 +1,20 @@
 import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
-import { firestoreConnect } from 'react-redux-firebase';
+import { firebaseConnect, firestoreConnect } from 'react-redux-firebase';
 import { Redirect } from 'react-router-dom';
 import { compose } from 'redux';
+import VerifyPasswordModal from './VerifyPasswordModal/VerifyPasswordModal.react';
 
 class Profile extends Component {
 
     state = {
-        // most likely will be managed in modal
-        currentPassword: '',
-        currentPasswordError: '',
-
+        confirmPassword: '',
         email: '',
         error: '',
         firstName: '',
         lastName: '',
-        oldPassword: '',
         newPassword: '',
-        showPasswordField: false
+        showVerifyPasswordModal: false
     }
 
     componentDidUpdate(prevProps) {
@@ -36,65 +33,73 @@ class Profile extends Component {
         this.setProfileInformationIfAuthenticated();
     }
 
+    handleConfirmPasswordModalSuccess = () => {
+        this.toggleVerifyPasswordModal();
+        this.updateEmailAndProfileInformation();
+    };
+
     handleInputChange = (e) => {
         this.setState({
             [e.target.name]: e.target.value
         });
     };
 
-    handleEmailUpdate = (e) => {
+    // handleEmailUpdate = (e) => {
 
-    };
+    // };
 
-    handlePasswordUpdate = (e) => {
+    // handlePasswordUpdate = (e) => {
 
-    };
-
-    handleReauthenticate = (e) => {
-        e.preventDefault();
-        const { firebase, user } = this.props;
-        const credentials = firebase.auth.EmailAuthProvider.credential(user.email, this.state.currentPassword);
-
-        firebase.auth().currentUser.reauthenticateAndRetrieveDataWithCredential(credentials)
-            .then(() => {
-                this.setState({
-                    currentPasswordError: '',
-                    showPasswordField: false
-                }, () => {
-                    this.updateEmailAndProfileInformation();
-                });
-            })
-            .catch((error) => {
-                this.setState({
-                    currentPasswordError: error.message
-                });
-            });
-    };
+    // };
 
     handleProfileUpdate = (e) => {
         e.preventDefault();
         this.updateEmailAndProfileInformation();
     };
 
+    toggleVerifyPasswordModal() {
+        this.setState({
+            showVerifyPasswordModal: !this.state.showVerifyPasswordModal
+        });
+    }
+
     // handleProfileUpdate = async (e) => {
     updateEmailAndProfileInformation = async () => {
         const { firebase, firestore, user } = this.props;
-        const { email, firstName, lastName} = this.state;
+        const { confirmPassword, email, firstName, lastName, newPassword} = this.state;
+        // Confirm password matching
+        if (newPassword && (confirmPassword !== newPassword)) {
+            return this.setState({
+                error: 'Confirm Password must match New Password.'
+            })
+        }
+
         try {
+            console.log('firebase auth current user:', firebase.auth().currentUser);
+            const firebaseAuthUser = firebase.auth().currentUser;
+            console.log('user email:', user.email);
+            console.log('email:', email);
+            // todo: currentUser doesn't stay up-to-date with user's email after .updateEmail() is called
             if (user.email !== email) {
-                await firebase.auth().currentUser.updateEmail(email);
+                // Firebase Authentication Request
+                await firebaseAuthUser.updateEmail(email);
             }
+            if (newPassword) {
+                // Firebase Authentication Request
+                await firebaseAuthUser.updatePassword(newPassword);
+            }
+
+            // Firestore request
             await firestore.collection('users').doc(user.uid).set({ firstName, lastName });
 
             this.setState({
-                currentPasswordError: '',
                 error: ''
             })
         } catch (error) {
             console.log('error:', error);
             if (error.code === 'auth/requires-recent-login') {
                 return this.setState({
-                    showPasswordField: true
+                    showVerifyPasswordModal: true
                 });
             }
             this.setState({
@@ -135,24 +140,6 @@ class Profile extends Component {
             <div>
                 <h1>Edit Profile</h1>
                 <p>{this.state.error}</p>
-                <p>{this.state.currentPasswordError}</p>
-
-                {/* turn this into a modal as its own form that will recall handleProfileUpdate on success and have its own error message */}
-                {this.state.showPasswordField &&
-                    <Fragment>
-                        <p>{this.state.error}</p>
-                        <form onSubmit={this.handleReauthenticate}>
-                            <input
-                                id='currentPassword'
-                                name='currentPassword'
-                                onChange={this.handleInputChange}
-                                type='password'
-                                value={this.state.currentPassword}
-                            />
-                            <input type='submit' value='Confirm Password' />
-                        </form>
-                    </Fragment>
-                }
 
                 <form onSubmit={this.handleProfileUpdate}>
                     <label htmlFor='email'>Email</label>
@@ -183,28 +170,29 @@ class Profile extends Component {
                 </form>
 
                 <form>
-                    <label htmlFor='oldPassword'>Old Password</label>
-                    <input
-                        id='oldPassword'
-                        name='oldPassword'
-                        onChange={this.handleInputChange}
-                        type='password'
-                    />
-                    <label htmlFor='password'>Password</label>
+                    <label htmlFor='password'>New Password</label>
                     <input
                         id='newPassword'
                         name='newPassword'
                         onChange={this.handleInputChange}
                         type='password'
                     />
-                    <label htmlFor='password'>Confirm Password</label>
+                    <label htmlFor='confirmPassword'>Confirm Password</label>
                     <input
+                        disabled={!this.state.newPassword}
                         id='confirmPassword'
                         name='confirmPassword'
                         onChange={this.handleInputChange}
                         type='password'
                     />
                 </form>
+                {this.state.showVerifyPasswordModal &&
+                    <VerifyPasswordModal
+                        onSuccess={this.handleConfirmPasswordModalSuccess}
+                        toggleModal={this.toggleVerifyPasswordModal}
+                        userEmail={this.props.user.email}
+                    />
+                }
             </div>
         );
     }
